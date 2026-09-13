@@ -59,21 +59,45 @@ python3 scripts/validate_entries.py   # ローカルでも同じ検証を実行�
 - `## サマリ` と `## この記事から学べること` の両方が存在し、サマリが空でない
 - 学びの `###` 見出しが 1 つ以上あり、各見出しが引用 (`>`) と説明文の両方を持つ
 
-### PR の自動処理について
+### 自動マージ
 
-**CI は PR を自動でクローズしない。**
-`validate` の結果はチェックとして表示するだけで、マージするか閉じるかは人間が判断する。
+内部 PR は `validate` が通ると自動的にマージされる。
 
-fork 由来の PR と外部作者の PR も同様に、ワークフローが自動で操作することはない。
+```
+PR 作成
+  ├─ validate が走る
+  └─ auto-merge が GitHub ネイティブの auto-merge を有効化する
+        ↓
+     validate 通過を GitHub が待ってマージ
+```
 
-`validate` は次の構成で、権限昇格の経路を持たない。
+`auto-merge` ワークフロー自体はマージを実行しない。
+有効化するだけで、実際のマージは必須ステータスチェック `validate-entries` の通過後に GitHub が行う。
 
-| | `validate` |
-| --- | --- |
-| トリガ | `pull_request` / `push` (main) |
-| 権限 | `contents: read` のみ |
-| secrets | 渡らない |
-| 書き込み | 一切行わない |
+自動マージを止めたい PR には `keep-open` ラベルを付ける。
+draft の PR も対象外になる。
 
-fork からの PR でも `GITHUB_TOKEN` は read-only で secrets も渡らないため、PR のコードを checkout して検証しても安全である。
-書き込み権限を持つワークフローはこのリポジトリに存在しない。
+### 外部 PR の扱い
+
+自動マージの対象は**このリポジトリ内のブランチから出された、書き込み権限を持つ作者の PR のみ**。
+fork 由来の PR と外部作者の PR は自動マージされず、人間が判断する。
+
+ガードは 3 重になっている。
+
+1. fork からの PR では `GITHUB_TOKEN` が read-only になるため、有効化 API を呼ぶこと自体ができない（GitHub の仕組みによる保証）
+2. ジョブの `if` で `head.repo.full_name == github.repository` を確認し、fork を明示的に除外する
+3. `author_association` が `OWNER` / `MEMBER` / `COLLABORATOR` のいずれかであることを確認する
+
+また、どちらのワークフローも **PR のコードを checkout しない / 実行しない**。
+`validate` は PR のコードを実行するが `contents: read` のみで書き込み権限を持たず、`auto-merge` は書き込み権限を持つが PR のコードに触れない。
+権限とコード実行が同じジョブに同居しない構成にしてある。
+
+### リポジトリ設定
+
+自動マージには以下の設定が必要。
+
+- リポジトリ設定の `Allow auto-merge` が有効
+- `main` の ruleset で `validate-entries` を必須ステータスチェックに指定
+
+ruleset が無いと PR がブロックされず、ネイティブ auto-merge は成立しない。
+リポジトリ管理者は bypass actor に設定してあるため、`main` への直接 push は従来どおり可能。

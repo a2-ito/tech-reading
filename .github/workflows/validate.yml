@@ -13,7 +13,9 @@ permissions:
 
 jobs:
   entries:
-    name: エントリ書式の検証
+    # このジョブ名がそのまま必須ステータスチェックの context になる。
+    # ruleset 側の設定と一致させる必要があるため、安易に変更しないこと。
+    name: validate-entries
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
