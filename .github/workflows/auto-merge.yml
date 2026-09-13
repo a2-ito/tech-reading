@@ -1,0 +1,40 @@
+name: auto-merge
+
+# 内部 PR に対して GitHub ネイティブの auto-merge を有効化する。
+#
+# このワークフローは PR をマージしない。有効化するだけで、実際のマージは
+# 必須ステータスチェック (validate-entries) の通過後に GitHub が行う。
+#
+# 安全設計:
+#   - PR のコードを checkout も実行もしない。
+#   - fork からの PR では GITHUB_TOKEN が read-only になるため、そもそも
+#     有効化 API を呼べない。加えて job の if でも明示的に除外する。
+#   - author_association が信頼できる値の場合のみ対象にする。
+#   - keep-open ラベルが付いた PR は対象外とする（エスケープハッチ）。
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  enable:
+    name: auto-merge を有効化する
+    # 1. 同一リポジトリのブランチから出された PR であること（fork を除外）
+    # 2. draft でないこと
+    # 3. 書き込み権限を持つ作者であること
+    # 4. keep-open ラベルが付いていないこと
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == false &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association) &&
+      !contains(github.event.pull_request.labels.*.name, 'keep-open')
+    runs-on: ubuntu-latest
+    steps:
+      - name: auto-merge を有効化する
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --merge "$PR_URL"

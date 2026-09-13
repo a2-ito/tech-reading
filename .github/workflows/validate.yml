@@ -1,0 +1,28 @@
+name: validate
+
+# fork からの PR でもこのワークフローは走るが、GITHUB_TOKEN は read-only で
+# secrets も渡らない。そのため PR のコードを checkout しても権限昇格は起きない。
+# 検証結果はチェック表示のみで、PR のクローズなどの書き込みは一切行わない。
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  entries:
+    # このジョブ名がそのまま必須ステータスチェックの context になる。
+    # ruleset 側の設定と一致させる必要があるため、安易に変更しないこと。
+    name: validate-entries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: entries/ の書式を検証する
+        run: python3 scripts/validate_entries.py

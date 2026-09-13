@@ -41,3 +41,63 @@ Claude Code で URL を渡してスキルを呼ぶ。
 
 URL の内容を取得し、上記書式のエントリを `entries/` に生成する。
 # tech-reading
+
+## CI
+
+PR を作成すると `validate` ワークフローが自動実行され、`entries/` 配下の全エントリが書式を満たしているか検証する。
+
+```bash
+python3 scripts/validate_entries.py   # ローカルでも同じ検証を実行できる
+```
+
+検証する項目は以下。
+
+- frontmatter に `title` / `author` / `category` / `published` / `url` がすべて存在し、空でない
+- `published` が `YYYY-MM-DD` / `YYYY-MM` / `Unknown` のいずれか
+- ファイル名が `YYYY-MM-DD-slug.md` 形式で、日付部分が `published` と一致する
+- `url` が http(s) で始まり、他のエントリと重複しない
+- `## サマリ` と `## この記事から学べること` の両方が存在し、サマリが空でない
+- 学びの `###` 見出しが 1 つ以上あり、各見出しが引用 (`>`) と説明文の両方を持つ
+
+### 自動マージ
+
+内部 PR は `validate` が通ると自動的にマージされる。
+
+```
+PR 作成
+  ├─ validate が走る
+  └─ auto-merge が GitHub ネイティブの auto-merge を有効化する
+        ↓
+     validate 通過を GitHub が待ってマージ
+```
+
+`auto-merge` ワークフロー自体はマージを実行しない。
+有効化するだけで、実際のマージは必須ステータスチェック `validate-entries` の通過後に GitHub が行う。
+
+自動マージを止めたい PR には `keep-open` ラベルを付ける。
+draft の PR も対象外になる。
+
+### 外部 PR の扱い
+
+自動マージの対象は**このリポジトリ内のブランチから出された、書き込み権限を持つ作者の PR のみ**。
+fork 由来の PR と外部作者の PR は自動マージされず、人間が判断する。
+
+ガードは 3 重になっている。
+
+1. fork からの PR では `GITHUB_TOKEN` が read-only になるため、有効化 API を呼ぶこと自体ができない（GitHub の仕組みによる保証）
+2. ジョブの `if` で `head.repo.full_name == github.repository` を確認し、fork を明示的に除外する
+3. `author_association` が `OWNER` / `MEMBER` / `COLLABORATOR` のいずれかであることを確認する
+
+また、どちらのワークフローも **PR のコードを checkout しない / 実行しない**。
+`validate` は PR のコードを実行するが `contents: read` のみで書き込み権限を持たず、`auto-merge` は書き込み権限を持つが PR のコードに触れない。
+権限とコード実行が同じジョブに同居しない構成にしてある。
+
+### リポジトリ設定
+
+自動マージには以下の設定が必要。
+
+- リポジトリ設定の `Allow auto-merge` が有効
+- `main` の ruleset で `validate-entries` を必須ステータスチェックに指定
+
+ruleset が無いと PR がブロックされず、ネイティブ auto-merge は成立しない。
+リポジトリ管理者は bypass actor に設定してあるため、`main` への直接 push は従来どおり可能。
