@@ -2,7 +2,7 @@ name: validate
 
 # fork からの PR でもこのワークフローは走るが、GITHUB_TOKEN は read-only で
 # secrets も渡らない。そのため PR のコードを checkout しても権限昇格は起きない。
-# 書き込みを伴う処理は auto-close.yml 側に隔離してある。
+# 検証結果はチェック表示のみで、PR のクローズなどの書き込みは一切行わない。
 on:
   pull_request:
   push:
