@@ -40,3 +40,4 @@ Claude Code で URL を渡してスキルを呼ぶ。
 ```
 
 URL の内容を取得し、上記書式のエントリを `entries/` に生成する。
+# tech-reading
