@@ -10,6 +10,7 @@ reception_checked: "YYYY-MM-DD"
 # citation_percentile: "top 1%"
 # hn_points: 0
 # hn_comments: 0
+# wikipedia_refs: 0
 # github_stars: 0
 ---
 
@@ -27,7 +28,9 @@ reception_checked: "YYYY-MM-DD"
 取得できなかった指標は空欄にせず「確認できず」と明記する。
 
 - 被引用数 N 件（OpenAlex、分野内 top X%、FWCI N）／ または「学術的な被引用数は該当なし（論文ではないため）」
+- 被引用の推移: 20XX年 N → 20XX年 N（論文のみ）
 - Hacker News: [Npt / N コメント](https://news.ycombinator.com/item?id=...) ／ または「Hacker News への投稿は確認できず」
+- Wikipedia から出典として参照: en: N ページ ／ または「Wikipedia からの参照は確認できず」
 
 ## この記事から学べること
 
