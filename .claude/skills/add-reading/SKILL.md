@@ -1,12 +1,12 @@
 ---
 name: add-reading
-description: 技術ブログ記事や論文の URL を引数に受け取り、その内容を読み取って `entries/YYYY-MM-DD-slug.md` にサマリ記事を1本生成するスキル。frontmatter（title / author / category / published / url）と「サマリ」「この記事から学べること（＋原文引用）」を含む md を作る。ユーザーが「/add-reading <URL>」と入力した場合、または「この記事をサマってリポジトリに追加して」「この論文を読んで entries に入れて」「記事のサマリを作って」のように URL を渡してこのリポジトリへエントリを追加する意図が読み取れる場合に発動する。
-allowed-tools: WebFetch, Read, Write, Bash, ToolSearch
+description: 技術ブログ記事や論文の URL を引数に受け取り、その内容を読み取って `entries/YYYY-MM-DD-slug.md` にサマリ記事を1本生成し、Pull Request の作成まで行うスキル。frontmatter（title / author / category / published / url）と「サマリ」「この記事から学べること（＋原文引用）」を含む md を作り、引用を原文と照合したうえで 1 記事 1 PR で提出する。ユーザーが「/add-reading <URL>」と入力した場合、または「この記事をサマってリポジトリに追加して」「この論文を読んで entries に入れて」「記事のサマリを作って」のように URL を渡してこのリポジトリへエントリを追加する意図が読み取れる場合に発動する。
+allowed-tools: WebFetch, Read, Write, Bash, ToolSearch, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__get_page_text, mcp__claude-in-chrome__tabs_close_mcp
 ---
 
 # add-reading
 
-技術記事・論文の URL から、このリポジトリ形式のサマリ md を 1 本生成する。
+技術記事・論文の URL から、このリポジトリ形式のサマリ md を 1 本生成し、Pull Request にして提出する。
 
 ## 入力
 
@@ -25,7 +25,15 @@ allowed-tools: WebFetch, Read, Write, Bash, ToolSearch
 - 本文の要旨と、引用に使える印象的な原文フレーズ
 
 arXiv の abs ページなど取得しづらい場合は、同じ論文の HTML 版や abstract ページを試す。
-取得に 2〜3 回失敗したら、無理に推測で書かず、ユーザーに状況を伝えて指示を仰ぐ。**本文を読めていない状態で内容を創作してはならない。**
+
+WebFetch のサマリは引用が省略・要約されることがあるため、**引用を使うなら原文テキストを自分で取得する**。
+取得できないときは次の順に試す。
+
+1. `curl` に User-Agent などブラウザ相当のヘッダを付ける（これで 403 が解けることが多い）
+2. PDF なら `curl` で落として `pdftotext -layout` にかける
+3. それでも 403 なら `mcp__claude-in-chrome__navigate` と `get_page_text` でブラウザ経由で読む（開いたタブは `tabs_close_mcp` で閉じる）
+
+ここまでやって取得できなければ、無理に推測で書かず、ユーザーに状況を伝えて指示を仰ぐ。**本文を読めていない状態で内容を創作してはならない。**
 
 ### 2. カテゴリを決める
 
@@ -72,6 +80,43 @@ url: "..."
 
 文章は日本語。`~/.claude/skills/japanese-tech-writing` の規範が使える場合はそれに従い、一文一行で書く。
 
-### 5. 報告する
+### 5. 引用を原文と照合する
 
-生成したファイルパスと、タイトル・カテゴリを 1 行で報告する。コミットはユーザーの指示があるまで行わない。
+**引用は必ず原文と突き合わせて検証する。** 記憶や要約から書き起こしてはならない。
+
+取得した原文テキストを一時ファイルに保存し、md 内の `> ` 行がすべて原文に含まれることをスクリプトで確認する。
+空白の畳み込みは行ってよい。
+PDF は行末ハイフンと透かし行の除去が必要になる。
+
+照合スクリプトは、原文を空白正規化した文字列に対して各引用が部分文字列として含まれるかを調べるだけでよい。
+
+一致しない引用は、正しい原文に直すか削除する。
+サイトの規約などで大量の転記を避ける必要がある場合は、引用を 1 文単位に絞り、**照合が目視に留まったことをユーザーへの報告と PR 本文に明記する**。
+
+### 6. リポジトリの検証を通す
+
+`python3 scripts/validate_entries.py` を実行する。
+エラーが出たら直してから次に進む。
+これは CI で走るものと同じ検証である。
+
+### 7. コミットして PR を作成する
+
+**1 記事 1 PR とする。** 複数記事を 1 つの PR にまとめない。
+
+手順は `git fetch origin` でベースブランチを最新化してから `git switch -c add-reading/<slug> origin/main` でブランチを切り、該当エントリだけを `git add` してコミットし、push して `gh pr create` する。
+
+守ること。
+
+- **ベースブランチを最新化してからブランチを切る**（`git fetch` を先に実行する）
+- コミットメッセージは Conventional Commits 形式、本文は日本語（`docs: 「タイトル」のサマリを追加`）
+- ラベルは `feature` / `ai-assisted` / `ai-generated` を付与し、PR 本文末尾に明記する
+- **トークンや署名付きの一時 URL を frontmatter に書かない。** このリポジトリは public であり、自動マージで即座に公開される。`url` には DOI や記事の正典 URL を記載し、差し替えたことを PR 本文に書く
+- PR 本文には、学べることの一覧、検証結果、原文取得で特筆すべきことがあれば記載する
+
+PR を出すと `validate` が走り、通れば自動的にマージされる。
+マージを確認したら、ローカルとリモートの作業ブランチを削除して片付ける。
+
+### 8. 報告する
+
+生成したファイルパス、タイトル、カテゴリ、PR の URL を報告する。
+引用の照合結果と、原文取得で通常と異なる手順を踏んだ場合はその旨も添える。
