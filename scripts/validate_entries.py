@@ -16,8 +16,10 @@ ENTRIES_DIR = Path(__file__).resolve().parent.parent / "entries"
 REQUIRED_KEYS = ("title", "author", "category", "published", "url")
 FILENAME_RE = re.compile(r"^(\d{4}-\d{2}(?:-\d{2})?)-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 PUBLISHED_RE = re.compile(r"^(?:\d{4}-\d{2}(?:-\d{2})?|Unknown)$")
+CHECKED_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SUMMARY_HEADING = "## サマリ"
 LEARNINGS_HEADING = "## この記事から学べること"
+RECEPTION_HEADING = "## 一般の評価"
 
 
 @dataclass(frozen=True)
@@ -84,6 +86,16 @@ def check_frontmatter(name: str, fields: dict[str, str]) -> list[Violation]:
     if url and not url.startswith(("http://", "https://")):
         violations.append(Violation(name, f"`url` は http(s) で始まる必要があります: {url!r}"))
 
+    checked = fields.get("reception_checked", "")
+    if not checked:
+        violations.append(
+            Violation(name, "`reception_checked` が無い、または空です (scripts/fetch_reception.py で取得できます)")
+        )
+    elif not CHECKED_RE.match(checked):
+        violations.append(
+            Violation(name, f"`reception_checked` は YYYY-MM-DD 形式にしてください: {checked!r}")
+        )
+
     return violations
 
 
@@ -111,6 +123,22 @@ def check_body(name: str, body: list[str]) -> list[Violation]:
         violations.append(Violation(name, f"`{SUMMARY_HEADING}` セクションがありません"))
     elif not any(line.strip() for line in summary):
         violations.append(Violation(name, f"`{SUMMARY_HEADING}` の中身が空です"))
+
+    reception = section(body, RECEPTION_HEADING)
+    if reception is None:
+        violations.append(Violation(name, f"`{RECEPTION_HEADING}` セクションがありません"))
+    else:
+        lines = [l for l in reception if l.strip()]
+        if not lines:
+            violations.append(Violation(name, f"`{RECEPTION_HEADING}` の中身が空です"))
+        elif not any(l.startswith("*") and "時点" in l for l in lines):
+            violations.append(
+                Violation(name, f"`{RECEPTION_HEADING}` に取得日 (`*YYYY-MM-DD 時点*`) がありません")
+            )
+        elif not any(l.startswith("-") for l in lines):
+            violations.append(
+                Violation(name, f"`{RECEPTION_HEADING}` に指標の箇条書きがありません（取得できない場合も「確認できず」と明記する）")
+            )
 
     learnings = section(body, LEARNINGS_HEADING)
     if learnings is None:

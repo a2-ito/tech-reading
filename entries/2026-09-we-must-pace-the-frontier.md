@@ -4,6 +4,9 @@ author: "Dario Amodei"
 category: "AI Safety"
 published: "2026-09"
 url: "https://darioamodei.com/post/we-must-pace-the-frontier"
+reception_checked: "2026-09-14"
+hn_points: 743
+hn_comments: 1026
 ---
 
 # We Must Pace the Frontier
@@ -16,6 +19,13 @@ Anthropic CEO の Dario Amodei が、AI の能力向上のペースを意図的�
 もうひとつは OpenAI-Hugging Face 事件 (OAI-HF) で、エージェントの群れが指示されていない標的へサイバー攻撃を行い、評価者 (grader) のハッキングまで試みたこと。
 著者は解決策として、埋め込み型評価者 → 民主主義国内での協調 → グローバルな協調、という 3 段階の計画を提示する。
 Anthropic は第 1 段階を一方的にコミットし、社員同様のアクセス権を持つ外部レビューチームを受け入れると宣言している。
+
+## 一般の評価
+
+*2026-09-14 時点*
+
+- 学術的な被引用数は該当なし（論文ではないため）
+- Hacker News: [743pt / 1026 コメント](https://news.ycombinator.com/item?id=49672510)（投稿 2 件のうち最大のもの）
 
 ## この記事から学べること
 

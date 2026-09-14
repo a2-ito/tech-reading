@@ -4,6 +4,9 @@ author: "Louis Claxton (Anthropic)"
 category: "Software Engineering"
 published: "2026-08-21"
 url: "https://claude.com/blog/the-ai-native-sdlc-playbook"
+reception_checked: "2026-09-14"
+hn_points: 7
+hn_comments: 1
 ---
 
 # The AI-Native SDLC playbook
@@ -15,6 +18,13 @@ url: "https://claude.com/blog/the-ai-native-sdlc-playbook"
 提案は、Plan / Design / Build / Test / Deploy / Maintain の 6 段階を直線ではなくループとして捉え直し、各段階を「バージョン管理にコミットされた成果物」で接続するというもの。
 `intent.md` → `spec.md` → `plan.md` → 差分とテスト → レビュー所見つき PR → インシデント記録、と繋がり、このコミットの連鎖がそのまま監査証跡になる。
 統制は会議ではなく hooks・サンドボックス・ブランチ保護といったコードで強制し、人間の判断は各ゲートに集約される。
+
+## 一般の評価
+
+*2026-09-14 時点*
+
+- 学術的な被引用数は該当なし（論文ではないため）
+- Hacker News: [7pt / 1 コメント](https://news.ycombinator.com/item?id=49451263)（投稿 5 件のうち最大のもの）
 
 ## この記事から学べること
 

@@ -21,11 +21,36 @@ templates/   エントリのテンプレート
 | `category` | カテゴリ（LLM / Architecture / SRE / Security など） |
 | `published` | 出版日 (`YYYY-MM-DD`) |
 | `url` | 元記事の URL |
+| `reception_checked` | 外部評価を取得した日 (`YYYY-MM-DD`) |
+| `citations` ほか | 取得できた指標のみ記載（`citations` / `citation_percentile` / `hn_points` / `hn_comments` / `github_stars`） |
 
-本文は以下の 2 セクション。
+本文は以下の 3 セクション。
 
 - **サマリ** — 何の課題に、何を提案し、どうだったか
+- **一般の評価** — 被引用数や Hacker News の反応など、第三者による受け止め
 - **この記事から学べること** — 学びごとに見出しを立て、説明＋原文からの引用を添える
+
+## 一般の評価
+
+記事が広く読まれたものか、一個人の意見に留まるものかを区別するために、外部の評価指標を記録する。
+
+```bash
+python3 scripts/fetch_reception.py <URL>
+```
+
+取得元はいずれも無料・APIキー不要。
+
+| 指標 | 取得元 | 対象 |
+| --- | --- | --- |
+| 被引用数 / FWCI / パーセンタイル | OpenAlex | URL から DOI が取れる論文 |
+| 投稿数 / スコア / コメント数 | Hacker News (Algolia) | すべて |
+| star 数 | GitHub API | URL が GitHub リポジトリのとき |
+
+**数値は必ず取得日 (`reception_checked`) とセットで記録する。** 指標は時間とともに変わるため、日付のない数値は誤解を生む。
+
+**取得できなかった指標は空欄にせず「確認できず」と明記する。** Hacker News に投稿が無いことは、その記事の評価が低いことを意味しない。単にその媒体が Hacker News 向きでないだけの場合が多く、空欄のまま放置すると読み手が誤読する。
+
+なお被リンク数は無料で取得できる API が無いため対象外としている。
 
 ## ファイル名
 
