@@ -4,6 +4,7 @@ author: "Jessica Apotheker, Sylvain Duranton, Vladimir Lukic, Nicolas de Bellefo
 category: "AI Adoption"
 published: "2025-01-15"
 url: "https://www.bcg.com/publications/2025/closing-the-ai-impact-gap"
+reception_checked: "2026-09-14"
 ---
 
 # From Potential to Profit: Closing the AI Impact Gap
@@ -15,6 +16,13 @@ AI は経営課題として定着し、4 分の 3 の経営層が 2025 年の最
 一方で実際に大きな価値を生めたと答えたのは 4 分の 1 にとどまり、この「期待と成果の落差」を impact gap と呼んでいる。
 差を分けたのは投資規模ではなく的の絞り方で、成果を出した企業は用例を平均 3.5 件に絞り、投資の 8 割超を基幹業務の作り替えと新規事業に充てていた。
 提言の中心は 10-20-70 の原則、すなわち労力の 7 割を人・プロセス・文化の変革に向けることである。
+
+## 一般の評価
+
+*2026-09-14 時点*
+
+- 学術的な被引用数は該当なし（論文ではないため）
+- Hacker News への投稿は確認できず
 
 ## この記事から学べること
 

@@ -4,6 +4,7 @@ author: "Alexander Puutio (Forbes)"
 category: "AI Adoption"
 published: "2026-02-02"
 url: "https://www.forbes.com/sites/alexanderpuutio/article/what-are-ai-native-organizations-and-how-to-build-one/"
+reception_checked: "2026-09-14"
 ---
 
 # What Are AI-Native Organizations And How To Build One
@@ -15,6 +16,13 @@ cloud-native や digital-first がそうだったように、新しい技術の�
 著者の定義は、AI を後から既存業務の高速化に足すのではなく、**仕事の構想そのものの出発点に AI を置く**組織というもの。
 digital-native やプラットフォーム企業との違いも整理され、前者は人間が主たる生産者でソフトウェアが支援する構造にとどまる点が対比される。
 結論として、AI ネイティブ化は原則としてグリーンフィールドの取り組みであり、後付けの改修では成立しないと論じる。
+
+## 一般の評価
+
+*2026-09-14 時点*
+
+- 学術的な被引用数は該当なし（論文ではないため）
+- Hacker News への投稿は確認できず
 
 ## この記事から学べること
 

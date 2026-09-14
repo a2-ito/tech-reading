@@ -4,6 +4,7 @@ author: "Kore.ai"
 category: "AI Adoption"
 published: "2026-06-04"
 url: "https://www.kore.ai/blog/what-is-ai-native-organization-benefits-examples"
+reception_checked: "2026-09-14"
 ---
 
 # What is an AI-native organization? How to build an AI-native enterprise
@@ -15,6 +16,13 @@ url: "https://www.kore.ai/blog/what-is-ai-native-organization-benefits-examples"
 判定法として「プラットフォームから AI を完全に取り除いたら、それでも動くか」という問いを置き、動くなら AI は機能であってアーキテクチャではないと切る。
 そのうえで AI-enabled / AI-first / AI-native を組み込みの深さで区別し、3 つの柱（アーキテクチャとしての知能、ガードレール内の自律性、複利的に増える知能）と、典型的な 3 つの失敗を整理している。
 なお記事の後半は自社製品 (Kore.ai Agent Platform, Artemis) の紹介で、ベンダーのオウンドメディア記事である点は差し引いて読む必要がある。
+
+## 一般の評価
+
+*2026-09-14 時点*
+
+- 学術的な被引用数は該当なし（論文ではないため）
+- Hacker News への投稿は確認できず
 
 ## この記事から学べること
 

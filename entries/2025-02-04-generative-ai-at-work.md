@@ -4,6 +4,11 @@ author: "Erik Brynjolfsson, Danielle Li, Lindsey Raymond"
 category: "AI Productivity"
 published: "2025-02-04"
 url: "https://doi.org/10.1093/qje/qjae044"
+reception_checked: "2026-09-14"
+citations: 820
+citation_percentile: "top 1%"
+hn_points: 4
+hn_comments: 1
 ---
 
 # Generative AI at Work
@@ -15,6 +20,13 @@ Fortune 500 企業のカスタマーサポート 5,172 人を対象に、GPT-3 �
 結果は 1 時間あたりの解決件数が平均 15% 増加。
 ただし効果は均一ではなく、経験の浅い低スキル層が 30% 増と大きく伸びる一方、最も熟練した層はほとんど伸びず、会話品質はわずかに低下した。
 さらに AI 停止中でも生産性が維持されることから、単なる依存ではなく定着する学習が起きていること、顧客の態度が穏やかになり離職率が下がることも示された。
+
+## 一般の評価
+
+*2026-09-14 時点*
+
+- 被引用数 820 件（OpenAlex、分野内 top 1%、FWCI 400.6）
+- Hacker News: [4pt / 1 コメント](https://news.ycombinator.com/item?id=42701522)
 
 ## この記事から学べること
 
