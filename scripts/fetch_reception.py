@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""記事・論文の外部評価（被引用数、Hacker News の反応、GitHub star）を取得する。
+"""記事・論文の外部評価（被引用数と推移、Hacker News の反応、Wikipedia からの参照、GitHub star）を取得する。
 
 使い方:
     python3 scripts/fetch_reception.py <URL>
 
 frontmatter に貼る行と、本文に貼る「## 一般の評価」セクションを出力する。
 取得できなかった指標は空欄にせず「確認できず」と明示する。数値には常に取得日を添える。
+
+ドメイン人気度（Tranco 等）や検索順位は意図的に採用していない。理由は README を参照。
 """
 
 from __future__ import annotations
@@ -50,6 +52,8 @@ class Reception:
     hn_points: int | None = None
     hn_comments: int | None = None
     hn_url: str | None = None
+    citation_trend: list[tuple[int, int]] = field(default_factory=list)
+    wikipedia_refs: dict[str, int] = field(default_factory=dict)
     github_stars: int | None = None
     github_repo: str | None = None
     notes: list[str] = field(default_factory=list)
@@ -68,6 +72,11 @@ def fetch_openalex(doi: str, out: Reception) -> None:
     out.citations = data.get("cited_by_count")
     fwci = data.get("fwci")
     out.fwci = round(fwci, 1) if isinstance(fwci, (int, float)) else None
+
+    counts = data.get("counts_by_year") or []
+    out.citation_trend = sorted(
+        (c["year"], c["cited_by_count"]) for c in counts if c.get("cited_by_count")
+    )[-4:]
 
     pct = data.get("citation_normalized_percentile") or {}
     if pct.get("is_in_top_1_percent"):
@@ -96,6 +105,29 @@ def fetch_hn(url: str, out: Reception) -> None:
     out.hn_url = f"https://news.ycombinator.com/item?id={best.get('objectID')}"
 
 
+def fetch_wikipedia(url: str, out: Reception) -> None:
+    """Wikipedia の本文から、この URL が出典として参照されている記事数を数える。
+
+    ドメイン全体ではなくパスまで含めて検索するため、記事単位の指標になる。
+    """
+    query = re.sub(r"^https?://", "", url).rstrip("/")
+    for lang in ("en", "ja"):
+        params = urllib.parse.urlencode(
+            {
+                "action": "query",
+                "list": "exturlusage",
+                "euquery": query,
+                "eulimit": "100",
+                "eunamespace": "0",
+                "format": "json",
+            }
+        )
+        data = get_json(f"https://{lang}.wikipedia.org/w/api.php?{params}")
+        hits = (data.get("query") or {}).get("exturlusage") or []
+        if hits:
+            out.wikipedia_refs[lang] = len(hits)
+
+
 def fetch_github(url: str, out: Reception) -> None:
     m = re.match(r"https?://(?:www\.)?github\.com/([^/]+)/([^/?#]+)", url)
     if not m:
@@ -118,7 +150,11 @@ def collect(url: str) -> Reception:
     else:
         out.notes.append("DOI が URL から取れないため被引用数は未取得")
 
-    for fn, label in ((fetch_hn, "Hacker News"), (fetch_github, "GitHub")):
+    for fn, label in (
+        (fetch_hn, "Hacker News"),
+        (fetch_wikipedia, "Wikipedia"),
+        (fetch_github, "GitHub"),
+    ):
         try:
             fn(url, out)
         except FetchError as e:
@@ -136,6 +172,8 @@ def render(url: str, r: Reception, today: str) -> str:
     if r.hn_points is not None:
         fm.append(f"hn_points: {r.hn_points}")
         fm.append(f"hn_comments: {r.hn_comments}")
+    if r.wikipedia_refs:
+        fm.append(f"wikipedia_refs: {sum(r.wikipedia_refs.values())}")
     if r.github_stars is not None:
         fm.append(f"github_stars: {r.github_stars}")
 
@@ -148,6 +186,9 @@ def render(url: str, r: Reception, today: str) -> str:
             extra.append(f"FWCI {r.fwci}")
         suffix = f"（OpenAlex、{'、'.join(extra)}）" if extra else "（OpenAlex）"
         body.append(f"- 被引用数 {r.citations} 件{suffix}")
+        if r.citation_trend:
+            trend = " → ".join(f"{y}年 {c}" for y, c in r.citation_trend)
+            body.append(f"- 被引用の推移: {trend}")
     else:
         body.append("- 学術的な被引用数は該当なし（論文ではないため）")
 
@@ -158,6 +199,12 @@ def render(url: str, r: Reception, today: str) -> str:
         )
     else:
         body.append("- Hacker News への投稿は確認できず")
+
+    if r.wikipedia_refs:
+        langs = "、".join(f"{lang}: {n} ページ" for lang, n in sorted(r.wikipedia_refs.items()))
+        body.append(f"- Wikipedia から出典として参照: {langs}")
+    else:
+        body.append("- Wikipedia からの参照は確認できず")
 
     if r.github_stars is not None:
         body.append(f"- GitHub: {r.github_stars} stars（{r.github_repo}）")

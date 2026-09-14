@@ -6,7 +6,8 @@ published: "2026-09"
 url: "https://darioamodei.com/post/we-must-pace-the-frontier"
 reception_checked: "2026-09-14"
 hn_points: 743
-hn_comments: 1026
+hn_comments: 1028
+wikipedia_refs: 2
 ---
 
 # We Must Pace the Frontier
@@ -25,7 +26,8 @@ Anthropic は第 1 段階を一方的にコミットし、社員同様のアク�
 *2026-09-14 時点*
 
 - 学術的な被引用数は該当なし（論文ではないため）
-- Hacker News: [743pt / 1026 コメント](https://news.ycombinator.com/item?id=49672510)（投稿 2 件のうち最大のもの）
+- Hacker News: [743pt / 1028 コメント](https://news.ycombinator.com/item?id=49672510)（投稿 2 件のうち最大のもの）
+- Wikipedia から出典として参照: en: 2 ページ
 
 ## この記事から学べること
 

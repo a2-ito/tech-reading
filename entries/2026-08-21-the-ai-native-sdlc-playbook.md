@@ -25,6 +25,7 @@ hn_comments: 1
 
 - 学術的な被引用数は該当なし（論文ではないため）
 - Hacker News: [7pt / 1 コメント](https://news.ycombinator.com/item?id=49451263)（投稿 5 件のうち最大のもの）
+- Wikipedia からの参照は確認できず
 
 ## この記事から学べること
 
