@@ -193,7 +193,11 @@ def render(url: str, r: Reception, today: str) -> str:
         body.append("- 学術的な被引用数は該当なし（論文ではないため）")
 
     if r.hn_points is not None:
-        plural = f"（投稿 {r.hn_submissions} 件のうち最大のもの）" if r.hn_submissions > 1 else ""
+        plural = (
+            f"（投稿 {r.hn_submissions} 件のうち最大のもの）"
+            if r.hn_submissions > 1
+            else ""
+        )
         body.append(
             f"- Hacker News: [{r.hn_points}pt / {r.hn_comments} コメント]({r.hn_url}){plural}"
         )
@@ -201,7 +205,9 @@ def render(url: str, r: Reception, today: str) -> str:
         body.append("- Hacker News への投稿は確認できず")
 
     if r.wikipedia_refs:
-        langs = "、".join(f"{lang}: {n} ページ" for lang, n in sorted(r.wikipedia_refs.items()))
+        langs = "、".join(
+            f"{lang}: {n} ページ" for lang, n in sorted(r.wikipedia_refs.items())
+        )
         body.append(f"- Wikipedia から出典として参照: {langs}")
     else:
         body.append("- Wikipedia からの参照は確認できず")
