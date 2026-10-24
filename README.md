@@ -14,15 +14,15 @@ templates/   エントリのテンプレート
 
 各 md は frontmatter と本文からなる。
 
-| フィールド | 内容 |
-| --- | --- |
-| `title` | 記事・論文のタイトル |
-| `author` | 著者名（複数は `,` 区切り） |
-| `category` | カテゴリ（LLM / Architecture / SRE / Security など） |
-| `published` | 出版日 (`YYYY-MM-DD`) |
-| `url` | 元記事の URL |
-| `reception_checked` | 外部評価を取得した日 (`YYYY-MM-DD`) |
-| `citations` ほか | 取得できた指標のみ記載（`citations` / `citation_percentile` / `hn_points` / `hn_comments` / `github_stars`） |
+| フィールド          | 内容                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `title`             | 記事・論文のタイトル                                                                                         |
+| `author`            | 著者名（複数は `,` 区切り）                                                                                  |
+| `category`          | カテゴリ（LLM / Architecture / SRE / Security など）                                                         |
+| `published`         | 出版日 (`YYYY-MM-DD`)                                                                                        |
+| `url`               | 元記事の URL                                                                                                 |
+| `reception_checked` | 外部評価を取得した日 (`YYYY-MM-DD`)                                                                          |
+| `citations` ほか    | 取得できた指標のみ記載（`citations` / `citation_percentile` / `hn_points` / `hn_comments` / `github_stars`） |
 
 本文は以下の 3 セクション。
 
@@ -40,12 +40,12 @@ python3 scripts/fetch_reception.py <URL>
 
 取得元はいずれも無料・APIキー不要。
 
-| 指標 | 取得元 | 対象 |
-| --- | --- | --- |
-| 被引用数 / FWCI / パーセンタイル / 年次推移 | OpenAlex | URL から DOI が取れる論文 |
-| 投稿数 / スコア / コメント数 | Hacker News (Algolia) | すべて |
-| 出典として参照している記事数 | Wikipedia (en / ja) | すべて |
-| star 数 | GitHub API | URL が GitHub リポジトリのとき |
+| 指標                                        | 取得元                | 対象                           |
+| ------------------------------------------- | --------------------- | ------------------------------ |
+| 被引用数 / FWCI / パーセンタイル / 年次推移 | OpenAlex              | URL から DOI が取れる論文      |
+| 投稿数 / スコア / コメント数                | Hacker News (Algolia) | すべて                         |
+| 出典として参照している記事数                | Wikipedia (en / ja)   | すべて                         |
+| star 数                                     | GitHub API            | URL が GitHub リポジトリのとき |
 
 **数値は必ず取得日 (`reception_checked`) とセットで記録する。** 指標は時間とともに変わるため、日付のない数値は誤解を生む。
 
@@ -57,10 +57,10 @@ python3 scripts/fetch_reception.py <URL>
 
 実測した例を挙げる。
 
-| 記事 | Tranco ドメイン順位 | Hacker News |
-| --- | --- | --- |
-| Forbes の記事 | 213 位 | 投稿なし |
-| BCG の記事 | 4,337 位 | 投稿なし |
+| 記事              | Tranco ドメイン順位  | Hacker News           |
+| ----------------- | -------------------- | --------------------- |
+| Forbes の記事     | 213 位               | 投稿なし              |
+| BCG の記事        | 4,337 位             | 投稿なし              |
 | Amodei のエッセイ | 100 万位以内に入らず | 743pt / 1026 コメント |
 
 大手媒体は何を載せても上位に出る一方、個人ドメインは反響の大きさに関わらず下位になる。
@@ -94,6 +94,7 @@ Claude Code で URL を渡してスキルを呼ぶ。
 ```
 
 URL の内容を取得し、上記書式のエントリを `entries/` に生成する。
+
 # tech-reading
 
 ## CI

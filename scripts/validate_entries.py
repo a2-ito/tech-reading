@@ -35,7 +35,9 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
         return {}, lines
 
     try:
-        end = next(i for i, line in enumerate(lines[1:], start=1) if line.strip() == "---")
+        end = next(
+            i for i, line in enumerate(lines[1:], start=1) if line.strip() == "---"
+        )
     except StopIteration:
         return {}, lines
 
@@ -70,30 +72,45 @@ def check_frontmatter(name: str, fields: dict[str, str]) -> list[Violation]:
     violations: list[Violation] = []
 
     if not fields:
-        return [Violation(name, "frontmatter (--- で囲まれたブロック) が先頭にありません")]
+        return [
+            Violation(name, "frontmatter (--- で囲まれたブロック) が先頭にありません")
+        ]
 
     for key in REQUIRED_KEYS:
         if not fields.get(key):
-            violations.append(Violation(name, f"frontmatter の `{key}` が無い、または空です"))
+            violations.append(
+                Violation(name, f"frontmatter の `{key}` が無い、または空です")
+            )
 
     published = fields.get("published", "")
     if published and not PUBLISHED_RE.match(published):
         violations.append(
-            Violation(name, f"`published` は YYYY-MM-DD / YYYY-MM / Unknown のいずれか: {published!r}")
+            Violation(
+                name,
+                f"`published` は YYYY-MM-DD / YYYY-MM / Unknown のいずれか: {published!r}",
+            )
         )
 
     url = fields.get("url", "")
     if url and not url.startswith(("http://", "https://")):
-        violations.append(Violation(name, f"`url` は http(s) で始まる必要があります: {url!r}"))
+        violations.append(
+            Violation(name, f"`url` は http(s) で始まる必要があります: {url!r}")
+        )
 
     checked = fields.get("reception_checked", "")
     if not checked:
         violations.append(
-            Violation(name, "`reception_checked` が無い、または空です (scripts/fetch_reception.py で取得できます)")
+            Violation(
+                name,
+                "`reception_checked` が無い、または空です (scripts/fetch_reception.py で取得できます)",
+            )
         )
     elif not CHECKED_RE.match(checked):
         violations.append(
-            Violation(name, f"`reception_checked` は YYYY-MM-DD 形式にしてください: {checked!r}")
+            Violation(
+                name,
+                f"`reception_checked` は YYYY-MM-DD 形式にしてください: {checked!r}",
+            )
         )
 
     return violations
@@ -103,13 +120,19 @@ def check_filename(name: str, fields: dict[str, str]) -> list[Violation]:
     match = FILENAME_RE.match(name)
     if not match:
         return [
-            Violation(name, "ファイル名は `YYYY-MM-DD-slug.md` 形式 (slug は英小文字ケバブケース) にしてください")
+            Violation(
+                name,
+                "ファイル名は `YYYY-MM-DD-slug.md` 形式 (slug は英小文字ケバブケース) にしてください",
+            )
         ]
 
     published = fields.get("published", "")
     if published and published != "Unknown" and match.group(1) != published:
         return [
-            Violation(name, f"ファイル名の日付 {match.group(1)} が frontmatter の published {published} と一致しません")
+            Violation(
+                name,
+                f"ファイル名の日付 {match.group(1)} が frontmatter の published {published} と一致しません",
+            )
         ]
 
     return []
@@ -120,29 +143,42 @@ def check_body(name: str, body: list[str]) -> list[Violation]:
 
     summary = section(body, SUMMARY_HEADING)
     if summary is None:
-        violations.append(Violation(name, f"`{SUMMARY_HEADING}` セクションがありません"))
+        violations.append(
+            Violation(name, f"`{SUMMARY_HEADING}` セクションがありません")
+        )
     elif not any(line.strip() for line in summary):
         violations.append(Violation(name, f"`{SUMMARY_HEADING}` の中身が空です"))
 
     reception = section(body, RECEPTION_HEADING)
     if reception is None:
-        violations.append(Violation(name, f"`{RECEPTION_HEADING}` セクションがありません"))
+        violations.append(
+            Violation(name, f"`{RECEPTION_HEADING}` セクションがありません")
+        )
     else:
         lines = [l for l in reception if l.strip()]
         if not lines:
             violations.append(Violation(name, f"`{RECEPTION_HEADING}` の中身が空です"))
-        elif not any(l.startswith("*") and "時点" in l for l in lines):
+        # 強調は Prettier が _ に揃える。手で書いた * も受け付ける
+        elif not any(l.startswith(("_", "*")) and "時点" in l for l in lines):
             violations.append(
-                Violation(name, f"`{RECEPTION_HEADING}` に取得日 (`*YYYY-MM-DD 時点*`) がありません")
+                Violation(
+                    name,
+                    f"`{RECEPTION_HEADING}` に取得日 (`_YYYY-MM-DD 時点_`) がありません",
+                )
             )
         elif not any(l.startswith("-") for l in lines):
             violations.append(
-                Violation(name, f"`{RECEPTION_HEADING}` に指標の箇条書きがありません（取得できない場合も「確認できず」と明記する）")
+                Violation(
+                    name,
+                    f"`{RECEPTION_HEADING}` に指標の箇条書きがありません（取得できない場合も「確認できず」と明記する）",
+                )
             )
 
     learnings = section(body, LEARNINGS_HEADING)
     if learnings is None:
-        violations.append(Violation(name, f"`{LEARNINGS_HEADING}` セクションがありません"))
+        violations.append(
+            Violation(name, f"`{LEARNINGS_HEADING}` セクションがありません")
+        )
         return violations
 
     subsections: list[tuple[str, list[str]]] = []
@@ -154,14 +190,21 @@ def check_body(name: str, body: list[str]) -> list[Violation]:
 
     if not subsections:
         violations.append(
-            Violation(name, f"`{LEARNINGS_HEADING}` の下に `### ` の学び見出しが 1 つもありません")
+            Violation(
+                name,
+                f"`{LEARNINGS_HEADING}` の下に `### ` の学び見出しが 1 つもありません",
+            )
         )
 
     for heading, lines in subsections:
         if not any(line.startswith(">") for line in lines):
-            violations.append(Violation(name, f"学び `{heading}` に引用 (`>` ブロック) がありません"))
+            violations.append(
+                Violation(name, f"学び `{heading}` に引用 (`>` ブロック) がありません")
+            )
         if not any(line.strip() and not line.startswith(">") for line in lines):
-            violations.append(Violation(name, f"学び `{heading}` に引用以外の説明文がありません"))
+            violations.append(
+                Violation(name, f"学び `{heading}` に引用以外の説明文がありません")
+            )
 
     return violations
 
@@ -186,12 +229,18 @@ def main() -> int:
         url = fields.get("url", "")
         if url:
             if url in seen_urls:
-                violations.append(Violation(name, f"`url` が {seen_urls[url]} と重複しています: {url}"))
+                violations.append(
+                    Violation(
+                        name, f"`url` が {seen_urls[url]} と重複しています: {url}"
+                    )
+                )
             else:
                 seen_urls[url] = name
 
     if violations:
-        print(f"検証 NG: {len(paths)} 件中 {len({v.path for v in violations})} 件のエントリに問題があります\n")
+        print(
+            f"検証 NG: {len(paths)} 件中 {len({v.path for v in violations})} 件のエントリに問題があります\n"
+        )
         for v in violations:
             print(f"  entries/{v.path}: {v.message}")
         print("\n書式は README.md と templates/entry.md を参照してください。")

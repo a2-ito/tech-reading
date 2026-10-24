@@ -22,7 +22,7 @@ reception_checked: "YYYY-MM-DD"
 
 ## 一般の評価
 
-*YYYY-MM-DD 時点*
+_YYYY-MM-DD 時点_
 
 `scripts/fetch_reception.py <URL>` の出力を貼る。
 取得できなかった指標は空欄にせず「確認できず」と明記する。
