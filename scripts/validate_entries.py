@@ -158,11 +158,12 @@ def check_body(name: str, body: list[str]) -> list[Violation]:
         lines = [l for l in reception if l.strip()]
         if not lines:
             violations.append(Violation(name, f"`{RECEPTION_HEADING}` の中身が空です"))
-        elif not any(l.startswith("*") and "時点" in l for l in lines):
+        # 強調は Prettier が _ に揃える。手で書いた * も受け付ける
+        elif not any(l.startswith(("_", "*")) and "時点" in l for l in lines):
             violations.append(
                 Violation(
                     name,
-                    f"`{RECEPTION_HEADING}` に取得日 (`*YYYY-MM-DD 時点*`) がありません",
+                    f"`{RECEPTION_HEADING}` に取得日 (`_YYYY-MM-DD 時点_`) がありません",
                 )
             )
         elif not any(l.startswith("-") for l in lines):

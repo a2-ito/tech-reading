@@ -177,7 +177,7 @@ def render(url: str, r: Reception, today: str) -> str:
     if r.github_stars is not None:
         fm.append(f"github_stars: {r.github_stars}")
 
-    body = ["## 一般の評価", "", f"*{today} 時点*", ""]
+    body = ["## 一般の評価", "", f"_{today} 時点_", ""]
     if r.citations is not None:
         extra = []
         if r.percentile:
